@@ -8,7 +8,7 @@ Django 3.2.3 | djangorestframework 3.12.4 | djoser 2.1.0 | webcolors 1.11.1 | Pi
 Деплой проекта на удалённый сервер:
 Клонировать репозиторий и перейти в него в командной строке:
 
-git clone https://github.com/esaviv/kittygram_final.git
+git clone https://github.com/josepeardy/kittygram_final.git
 cd kittygram_final/
 Создать файл .env и заполнить его по образцу .env.template.
 
