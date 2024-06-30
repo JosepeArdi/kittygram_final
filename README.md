@@ -1,93 +1,169 @@
-Kittygram в контейнерах и CI/CD с помощью GitHub Actions
-Описание
-Социальная сеть для обмена фотографиями любимых питомцев. Проект состоит из бэкенд-приложения на Django и фронтенд-приложения на React.
+# Kittygram
 
-Технологии
-Django 3.2.3 | djangorestframework 3.12.4 | djoser 2.1.0 | webcolors 1.11.1 | Pillow 9.0.0 | pytest 6.2.4 | pytest-django 4.4.0 | pytest-pythonpath 0.7.3 | python-dotenv 0.19.0
+[![Main Kittygram workflow](https://github.com/Josepeardi/kittygram_final/actions/workflows/main.yml/badge.svg)](https://github.com/Josepeardi/kittygram_final/actions/workflows/main.yml)
 
-Деплой проекта на удалённый сервер:
-Клонировать репозиторий и перейти в него в командной строке:
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fmaufen.zapto.org%2F)](https://maufen.zapto.org/)
 
-git clone https://github.com/josepeardy/kittygram_final.git
-cd kittygram_final/
-Создать файл .env и заполнить его по образцу .env.template.
 
-Перейдите в директорию бэкенд-приложение проекта:
+![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white) ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 
-cd backend/
-Создать и активировать виртуальное окружение:
+## Описание
+- Проект Kittygram позволяет пользователям делиться своими фотографиями котиков и просматривать фотографии котиков других пользователей.
+- При загрузке фото котика, пользователь должен ввести имя котика, год его рождения. При желании, может добавить ему достижения.
+- Добавлять и просматривать фотографии могут только зарегистрированные и авторизованные пользователи.
+- Только авторы могут изменять фотографии своих питомцев и описание.
 
-python3 -m venv venv
-source env/bin/activate
-python -m pip install --upgrade pip
-Установить зависимости из файла requirements.txt:
+## Технологии
+- Python
+- Docker
+- PostgreSQL
+- Django REST framework
+- Gunicorn
+- Nginx
+- React
 
-pip install -r requirements.txt
-Перейдите в директорию, где лежит файл docker-compose.yml и запустит все контейнеры, описанные в конфиге:
+## Локальное развертывание
 
-docker compose up -d
+Клонировать репозиторий:
+```shell
+git clone git clone <https or SSH URL>
+```
+Перейти в каталог проекта:
+```shell
+cd kittygram
+```
+
+Создать .env файл со следующим содержанием:
+```shell
+# DB
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=<db name>
+DB_HOST=db
+DB_PORT=5432
+
+# Django settings
+SECRET_KEY=<django secret key>
+DEBUG=False
+ALLOWED_HOSTS=127.0.0.1;localhost;<example.com;xxx.xxx.xxx.xxx>
+
+```
+Развернуть приложение:
+```shell
+sudo docker compose -f docker-compose.yml up
+```
+После успешного запуска, проект доступен на локальном IP `127.0.0.1:9000`.
+
+## Развертывание на удаленном сервере
+Для развертывания на удаленном сервере необходимо клонировать репозиторий на локальную машину. Подготовить и загрузить образы на Docker Hub.
+
+Клонировать репозиторий:
+```shell
+git clone git clone <https or SSH URL>
+```
+Перейти в каталог проекта:
+```shell
+cd kittygram
+```
+
+Создать docker images образы:
+```shell
+sudo docker build -t <username>/kittygram_backend backend/
+sudo docker build -t <username>/kittygram_frontend frontend/
+sudo docker build -t <username>/kittygram_gateway nginx/
+```
+Загрузить образы на Docker Hub:
+```shell
+sudo docker push <username>/kittygram_backend
+sudo docker push <username>/kittygram_frontend
+sudo docker push <username>/kittygram_gateway
+```
+Создать .env файл со следующим содержанием:
+```shell
+# DB
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=<db name>
+DB_HOST=db
+DB_PORT=5432
+
+# Django settings
+SECRET_KEY=<django secret key>
+DEBUG=False
+ALLOWED_HOSTS=127.0.0.1;localhost;<example.com;xxx.xxx.xxx.xxx>
+
+```
+
+💡 Дальнейшая инструкция предполагает, что удаленный сервер настроен на работу по `SSH`.
+На сервере установлен Docker. Установлен и настроен nginx в качестве балансировщика
+нагрузки.
+
+Перенести на удаленный сервер файлы `.env` `docker-compose.production.yml`:
+```shell
+scp .env docker-compose.production.yml <user@server-address>:/home/<user name>/kittygram
+```
+Подключиться к серверу:
+```shell
+ssh user@server-address
+```
+Перейти в директорию `kittygram`:
+```shell
+cd /home/<user name>/kittygram
+```
+Выполнить сборку приложений:
+```shell
+sudo docker compose -f docker-compose.production.yml up -d
+```
 Выполнить миграции:
-
-docker compose exec backend python manage.py migrate
-Собрать статику бэкенд-приложения:
-
-sudo docker compose exec backend python manage.py collectstatic --no-input
-Открыть в браузере страницу http://localhost:9000 - проверить корректность работы проекта.
-
-Перейти по адресу http://localhost:9000/admin/ - убедиться, что страница отображается корректно.
-
-Перейди в настройки репозитория проекта на GitHub — Settings -> Secrets and Variables → Actions -> New repository secret.
-
-Сохранить переменные:
-
-DOCKER_PASSWORD - пароль от аккаунта на Docker Hub;
-
-DOCKER_USERNAME - имя пользователя Docker Hub;
-
-HOST -  IP-адрес вашего сервера;
-
-USER - имя пользователя на сервере;
-
-SSH_KEY - содержимое текстового файла с закрытым SSH-ключом;
-
-SSH_PASSPHRASE - парольная фраза к ssh-ключу;
-
-TELEGRAM_TO - ID телеграм-аккаунта;
-
-TELEGRAM_TOKEN - токен телеграм-бота.
-Перейди в настройки репозитория проекта -> Variables → New repository variable.
-
-Сохранить переменную:
-
-SECRET_KEY - секретный ключ Django.
-На удаленном сервере описать настройки Nginx-сервера:
-
-sudo nano /etc/nginx/sites-enabled/default
+```shell
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+```
+Собрать статику:
+```shell
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+```
+Скопировать статику:
+```shell
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. web/backend_static/static
+```
+Настроить шлюз для перенаправления запросов на `9000` порт, который слушает контейнер `kittygram_gateway`
+```shell
+sudo  nano /etc/nginx/sites-enabled/default
+```
+Пример конфигурации Nginx:
+```shell
 server {
-    server_name <ваш-домен>;
+    server_name example.com;
 
     location / {
-        proxy_set_header Host $http_host;
         proxy_pass http://127.0.0.1:9000;
     }
+}
+
+
+```
 Получить и настроить SSL-сертификат вашим любимым способом.
 
-Проверить файл конфигурации на ошибки:
+Перезапустить nginx:
+```shell
+sudo systemctl restart nginx.service
+```
 
-sudo nginx -t 
-Перезагрузить конфигурацию Nginx:
+## GitHub Actions
+Для использования автоматизированного развертывания и тестирования нужно 
+изменить `.github/workflows/main.yml` под свои параметры и аккаунт.
 
-sudo systemctl reload nginx 
-На локальном компьютере в рабочей папке проекта проверить код на соответствие требованиям PEP8 по оформлению Python-кода:
+Actions secrets:
+- `secrets.DOCKER_USERNAME`
+- `secrets.DOCKER_PASSWORD`
+- `secrets.HOST`
+- `secrets.USER`
+- `secrets.SSH_KEY`
+- `secrets.SSH_PASSPHRASE`
+- `secrets.TELEGRAM_TO`
+- `secrets.TELEGRAM_TOKEN`
 
-(venv) ... Dev/kittygram_final$ flake8 .
-Сделать коммит и запушить его в удалённый репозиторий:
 
-(venv) ... Dev/kittygram_final$ git add .
-(venv) ... Dev/kittygram_final$ git commit -m 'Add Actions'
-(venv) ... Dev/kittygram_final$ git push
-После получение сообщения об успешном размещение проекта, открыть в браузере страницу http://<ваш-домен> - проверить корректность работы проекта.
+### Автор проекта
 
-Перейти по адресу http://<ваш-домен>/admin/ - убедиться, что страница отображается корректно.
-
-Автор
+[Андрей Бузинов](https://github.com/JosepeArdi)
